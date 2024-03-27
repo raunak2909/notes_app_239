@@ -1,85 +1,56 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:notes_app_239/note_model.dart';
+import 'package:notes_app_239/todo_model.dart';
 
-class HomePage extends StatefulWidget {
+class TodoPage extends StatefulWidget {
+  const TodoPage({super.key});
+
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<TodoPage> createState() => _TodoPageState();
 }
 
-class _HomePageState extends State<HomePage> {
-  List<NoteModel> listNotes = [];
+class _TodoPageState extends State<TodoPage> {
 
-  var dtFormat = DateFormat.MMMMEEEEd();
+  List<TodoModel> listTodo = [];
 
   var titleController = TextEditingController();
   var descController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Todo'),
+        title: Text('Todos'),
       ),
-      body: listNotes.isNotEmpty
-          ? ListView.builder(
-              itemCount: listNotes.length,
-              itemBuilder: (_, index) {
-                return ListTile(
-                  onTap: () {
-                    /// update
-                    ///
-                    ///
+      body: ListView.builder(
+        itemCount: listTodo.length,
+          itemBuilder: (_, index){
+        return CheckboxListTile(
+          tileColor: listTodo[index].isCompleted ? Colors.green : Colors.orange,
+          controlAffinity: ListTileControlAffinity.leading,
+            value: listTodo[index].isCompleted,
+            onChanged: (value){
+              listTodo[index].isCompleted = value!;
+              setState(() {
 
-                    titleController.text = listNotes[index].title;
-                    descController.text = listNotes[index].desc;
-
-                    showModalBottomSheet(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(51))),
-                        context: context,
-                        builder: (_) {
-                          return bottomSheetUI(
-                              isUpdate: true,
-                              updateIndex: index,
-                              createdAt: listNotes[index].createdAt);
-                        });
-                  },
-                  title: Text(listNotes[index].title),
-                  subtitle: Text(listNotes[index].desc),
-                  trailing: Column(
-                    children: [
-                      Text(dtFormat.format(DateTime.fromMillisecondsSinceEpoch(
-                          listNotes[index].createdAt))),
-                      SizedBox(height: 11),
-                      InkWell(
-                          onTap: () {
-                            ///delete
-                            listNotes.removeAt(index);
-                            setState(() {});
-                          },
-                          child: Icon(Icons.delete)),
-                    ],
-                  ),
-                );
-              })
-          : Center(
-              child: Text('No Notes yet..'),
-            ),
+              });
+            },
+          title: Text(listTodo[index].title, style: TextStyle(
+            decoration: listTodo[index].isCompleted ? TextDecoration.lineThrough : TextDecoration.none
+          ),),
+          subtitle: Text(listTodo[index].desc, style: TextStyle(
+              decoration: listTodo[index].isCompleted ? TextDecoration.lineThrough : TextDecoration.none
+          ),),
+        );
+      }),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          /// overlays
-          titleController.clear();
-          descController.clear();
-
+        onPressed: (){
           showModalBottomSheet(
+              context: context,
               shape: RoundedRectangleBorder(
                   borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(51))),
-              context: context,
-              builder: (_) {
+                  BorderRadius.vertical(top: Radius.circular(51))),
+              builder: (_){
                 return bottomSheetUI();
               });
         },
@@ -101,7 +72,7 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           children: [
             Text(
-              isUpdate ? 'Update Note' : 'Add Note',
+              isUpdate ? 'Update Todo' : 'Add Todo',
               style: TextStyle(fontSize: 21),
             ),
             SizedBox(
@@ -131,7 +102,7 @@ class _HomePageState extends State<HomePage> {
                           "createdAt": createdAt
                         };*/
 
-                        listNotes[updateIndex] = NoteModel(
+                        listTodo[updateIndex] = TodoModel(
                             title: titleController.text,
                             desc: descController.text,
                             createdAt: createdAt);
@@ -143,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                       "createdAt" : DateTime.now().millisecondsSinceEpoch
                     });*/
 
-                        listNotes.add(NoteModel(
+                        listTodo.add(TodoModel(
                             title: titleController.text,
                             desc: descController.text,
                             createdAt: DateTime.now().millisecondsSinceEpoch));
